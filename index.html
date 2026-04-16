@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#22C55E">
+<meta name="apple-mobile-web-app-title" content="减肥记录">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2322C55E' width='100' height='100' rx='20'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='white'>💪</text></svg>">
+<script>
+// 内嵌 manifest，无需外部文件
+const manifest = {
+  name: "罗鸣道减肥记录",
+  short_name: "减肥记录",
+  description: "减肥追踪 - 记录体重、饮水、步数",
+  start_url: location.href,
+  display: "standalone",
+  orientation: "portrait",
+  background_color: "#F0FBF4",
+  theme_color: "#22C55E",
+  icons: [{
+    src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect fill="#22C55E" width="512" height="512" rx="96"/><text x="256" y="350" font-size="280" text-anchor="middle" fill="white">💪</text></svg>'),
+    sizes: "512x512",
+    type: "image/svg+xml",
+    purpose: "any maskable"
+  }]
+};
+const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+const link = document.createElement('link');
+link.rel = 'manifest';
+link.href = URL.createObjectURL(blob);
+document.head.appendChild(link);
+</script>
+<title>罗鸣道减肥记录</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #F0FBF4;
+  --bg-card: #FFFFFF;
+  --primary: #22C55E;
+  --primary-light: #BBF7D0;
+  --primary-2: #86EFAC;
+  --accent: #F97316;
+  --accent-light: #FED7AA;
+  --blue: #3B82F6;
+  --blue-light: #DBEAFE;
+  --water: #0EA5E9;
+  --water-light: #E0F2FE;
+  --red: #EF4444;
+  --text: #1F2937;
+  --text-light: #6B7280;
+  --border: #D1FAE5;
+  --shadow: 0 2px 16px rgba(34, 197, 94, 0.08);
+  --shadow-md: 0 4px 24px rgba(34, 197, 94, 0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --nav-h: 68px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
+html { height: 100%; overflow: hidden; }
+body {
+  height: 100%;
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-overflow-scrolling: touch;
+}
+.dm { font-family: 'DM Sans', sans-serif; }
+
+/* App shell — fixed fullscreen, flex column */
+#app {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Scrollable content area */
+.page-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 16px 16px calc(var(--nav-h) + var(--safe-bottom) + 16px) 16px;
+  scroll-behavior: smooth;
+  will-change: scroll-position;
+}
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Top Header */
+.header {
+  padding: 16px 16px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+}
+.header-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.header-title span { color: var(--primary); }
+.header-sub { font-size: 13px; color: var(--text-light); margin-top: 2px; }
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+  animation: cardIn 0.4s ease both;
+}
+@keyframes cardIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.card:nth-child(2) { animation-delay: 0.06s; }
+.card:nth-child(3) { animation-delay: 0.12s; }
+.card:nth-child(4) { animation-delay: 0.18s; }
+
+.card-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500; color: var(--text-light);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 10px;
+}
+
+/* Dashboard grid */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.dash-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  animation: cardIn 0.4s ease both;
+}
+.dash-card:nth-child(1) { animation-delay: 0.04s; }
+.dash-card:nth-child(2) { animation-delay: 0.1s; }
+.dash-card:nth-child(3) { animation-delay: 0.16s; }
+.dash-card:nth-child(4) { animation-delay: 0.22s; }
+.dash-card-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+}
+.dash-card-val {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 28px; font-weight: 700; line-height: 1;
+  margin-bottom: 4px;
+}
+.dash-card-sub { font-size: 12px; color: var(--text-light); }
+.dash-card-change { font-size: 11px; margin-top: 6px; font-weight: 500; }
+.positive { color: var(--primary); }
+.negative { color: var(--red); }
+.neutral { color: var(--text-light); }
+
+/* Big stats card */
+.big-stat { text-align: center; padding: 24px 18px; }
+.big-stat-num {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 56px; font-weight: 700;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--primary), #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.big-stat-unit { font-size: 20px; font-weight: 400; opacity: 0.7; }
+.big-stat-label { font-size: 14px; color: var(--text-light); margin-top: 6px; }
+.big-stat-comp {
+  display: flex; gap: 16px; justify-content: center; margin-top: 14px;
+  font-size: 13px; color: var(--text-light);
+}
+.big-stat-comp span { font-family: 'DM Sans'; font-weight: 600; color: var(--text); }
+
+/* Input styles */
+.input-card { padding: 20px; }
+.big-input-wrap {
+  display: flex; align-items: baseline; justify-content: center; gap: 4px;
+  margin-bottom: 16px;
+}
+.big-input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 52px; font-weight: 700;
+  border: none; outline: none;
+  background: transparent;
+  color: var(--text);
+  width: 160px; text-align: center;
+  border-bottom: 3px solid var(--primary-light);
+  padding-bottom: 4px;
+  transition: border-color 0.2s;
+}
+.big-input:focus { border-bottom-color: var(--primary); }
+.big-input::placeholder { color: var(--primary-2); }
+.input-unit { font-size: 22px; font-weight: 500; color: var(--text-light); }
+
+.input-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+.btn {
+  padding: 10px 22px; border-radius: 50px; border: none; cursor: pointer;
+  font-size: 15px; font-weight: 600; font-family: 'Noto Sans SC', sans-serif;
+  transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+}
+.btn:active { transform: scale(0.95); }
+.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(34,197,94,0.35); }
+.btn-primary:hover { background: #16a34a; }
+.btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary-light); }
+.btn-outline:hover { border-color: var(--primary); }
+.btn-sm { padding: 7px 14px; font-size: 13px; }
+.btn-danger { background: #FEE2E2; color: var(--red); }
+.btn-ghost { background: var(--bg); color: var(--text-light); }
+
+/* Water progress ring */
+.water-ring-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 10px 0 6px;
+}
+.water-ring-svg { position: relative; width: 160px; height: 160px; }
+.water-ring-svg svg { transform: rotate(-90deg); }
+.water-ring-text {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+}
+.water-ring-num { font-size: 40px; font-weight: 700; color: var(--water); }
+.water-ring-label { font-size: 13px; color: var(--text-light); }
+.water-cups { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 0 4px 8px; }
+.cup-btn {
+  width: 42px; height: 42px; border-radius: 12px;
+  border: 2px solid var(--water-light);
+  background: var(--bg-card);
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.cup-btn:hover { border-color: var(--water); transform: scale(1.05); }
+.cup-btn:active { transform: scale(0.92); }
+.cup-btn.filled { background: var(--water); border-color: var(--water); }
+.cup-btn.filled svg path { fill: white; }
+.water-tip { font-size: 12px; color: var(--text-light); text-align: center; margin-top: 8px; }
+
+/* Step counter */
+.step-ring { display: flex; justify-content: center; padding: 6px 0; }
+.step-display { text-align: center; }
+.step-num {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 52px; font-weight: 700;
+  background: linear-gradient(135deg, var(--blue), #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.step-goal { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+.step-goal span { font-family: 'DM Sans', sans-serif; font-weight: 600; color: var(--blue); }
+.progress-bar-wrap { margin: 12px 0 4px; }
+.progress-bar-bg {
+  height: 10px; border-radius: 5px; background: var(--blue-light);
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%; border-radius: 5px;
+  background: linear-gradient(90deg, var(--blue), #60a5fa);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; align-items: center; justify-content: flex-end;
+}
+.step-extra { display: flex; gap: 20px; justify-content: center; margin-top: 12px; }
+.step-extra-item { text-align: center; }
+.step-extra-val { font-family: 'DM Sans'; font-size: 20px; font-weight: 700; color: var(--accent); }
+.step-extra-lbl { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+/* History list */
+.history-title {
+  font-size: 13px; font-weight: 600; color: var(--text-light);
+  margin-bottom: 10px; padding: 0 2px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.history-list { max-height: 280px; overflow-y: auto; }
+.history-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--bg);
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+.history-item:last-child { border-bottom: none; }
+.history-date { font-size: 13px; color: var(--text-light); }
+.history-val { font-family: 'DM Sans'; font-size: 16px; font-weight: 700; }
+.history-change {
+  font-size: 12px; font-family: 'DM Sans'; font-weight: 600;
+  min-width: 60px; text-align: right;
+}
+.history-del {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: #FEE2E2; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--red); transition: all 0.2s; opacity: 0.7;
+}
+.history-del:hover { opacity: 1; transform: scale(1.1); }
+.history-empty {
+  text-align: center; padding: 28px 0;
+  color: var(--text-light); font-size: 14px;
+}
+.history-empty-icon { font-size: 36px; margin-bottom: 8px; opacity: 0.4; }
+
+/* Trend charts */
+.chart-wrap { padding: 4px 0 12px; position: relative; }
+.chart-wrap canvas { max-height: 220px; }
+.tab-bar {
+  display: flex; gap: 8px; margin-bottom: 14px;
+  background: var(--bg-card); border-radius: 12px; padding: 4px;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+}
+.tab-btn {
+  flex: 1; padding: 8px; border-radius: 9px; border: none; cursor: pointer;
+  font-size: 13px; font-weight: 600; font-family: 'Noto Sans SC';
+  background: transparent; color: var(--text-light);
+  transition: all 0.2s;
+}
+.tab-btn.active { background: var(--primary); color: white; }
+
+/* Setup / Onboarding */
+.setup-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  padding: 32px 24px;
+  animation: fadeIn 0.4s ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.setup-logo { font-size: 14px; color: var(--primary); font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.setup-title { font-size: 28px; font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
+.setup-title span { color: var(--primary); }
+.setup-sub { font-size: 15px; color: var(--text-light); margin-bottom: 20px; }
+.setup-quote {
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin: 0 0 24px;
+  display: flex;
+  align-items: center; gap: 12px;
+  border: 1px solid #FCD34D;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.15);
+}
+.quote-icon { font-size: 28px; }
+.quote-text {
+  font-size: 15px; font-weight: 600; color: #92400E;
+  line-height: 1.4;
+}
+
+/* 每日激励语 */
+.daily-quote {
+  background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--primary-light);
+  display: flex; align-items: center; gap: 10px;
+}
+.quote-tag {
+  background: var(--primary);
+  color: white;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 8px; border-radius: 20px;
+  white-space: nowrap;
+}
+.quote-content {
+  font-size: 14px; font-weight: 500; color: var(--text);
+  flex: 1;
+}
+
+/* 核心激励语（金黄色） */
+.core-quote {
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+  border: 1px solid #FCD34D;
+  box-shadow: 0 2px 12px rgba(245, 158, 11, 0.15);
+  animation: cardIn 0.5s ease both;
+}
+.core-quote-icon { font-size: 28px; }
+.core-quote-text {
+  font-size: 15px; font-weight: 600; color: #92400E;
+  line-height: 1.4;
+}
+.setup-field { margin-bottom: 20px; }
+.setup-label { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+.setup-input {
+  width: 100%; padding: 14px 16px; border-radius: 12px;
+  border: 2px solid var(--border); font-size: 18px;
+  font-family: 'DM Sans'; font-weight: 600;
+  background: var(--bg-card); color: var(--text);
+  outline: none; transition: border-color 0.2s;
+}
+.setup-input:focus { border-color: var(--primary); }
+.setup-input::placeholder { color: var(--primary-2); font-weight: 400; }
+.setup-hint { font-size: 12px; color: var(--text-light); margin-top: 6px; }
+.setup-btn {
+  width: 100%; padding: 16px; border-radius: 14px; border: none;
+  background: var(--primary); color: white;
+  font-size: 17px; font-weight: 700; cursor: pointer;
+  font-family: 'Noto Sans SC';
+  box-shadow: 0 6px 20px rgba(34,197,94,0.35);
+  transition: all 0.2s; margin-top: auto;
+}
+.setup-btn:active { transform: scale(0.97); }
+.setup-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.setup-step { font-size: 12px; color: var(--primary); font-weight: 600; margin-bottom: 10px; }
+
+/* Bottom Nav */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: flex-start;
+  z-index: 50;
+  padding-top: 6px;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  padding: 6px 4px; border: none; background: transparent;
+  cursor: pointer; transition: all 0.2s;
+}
+.nav-icon { width: 26px; height: 26px; transition: transform 0.2s; }
+.nav-label { font-size: 10px; font-weight: 500; color: var(--text-light); transition: color 0.2s; }
+.nav-item.active .nav-label { color: var(--primary); }
+.nav-item.active .nav-icon { transform: scale(1.15); }
+
+/* Actions row */
+.actions-row {
+  display: flex; gap: 10px; margin-top: 12px;
+}
+.actions-row .btn { flex: 1; justify-content: center; }
+
+/* Streak badge */
+.streak-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--accent-light); color: var(--accent);
+  font-size: 11px; font-weight: 700; padding: 3px 8px;
+  border-radius: 20px; font-family: 'DM Sans';
+}
+
+/* Toast notification */
+.toast {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-80px);
+  background: var(--text); color: white;
+  padding: 12px 20px; border-radius: 12px;
+  font-size: 14px; font-weight: 500; z-index: 200;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* Modal / Confirm */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+.modal {
+  background: var(--bg-card); border-radius: 20px;
+  padding: 28px 24px; width: 100%; max-width: 340px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.modal-body { font-size: 14px; color: var(--text-light); margin-bottom: 22px; line-height: 1.6; }
+.modal-actions { display: flex; gap: 10px; }
+.modal-actions .btn { flex: 1; justify-content: center; }
+
+/* Stats summary row */
+.stats-row {
+  display: flex; gap: 12px; margin: 10px 0 16px;
+}
+.stat-chip {
+  flex: 1; background: var(--bg); border-radius: 10px;
+  padding: 10px 12px; text-align: center;
+  border: 1px solid var(--border);
+}
+.stat-chip-val { font-family: 'DM Sans'; font-size: 18px; font-weight: 700; }
+.stat-chip-lbl { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+/* Decorative leaf SVG */
+.leaf-deco { position: absolute; opacity: 0.06; pointer-events: none; }
+
+/* Pulse animation for updates */
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+.pulse { animation: pulse 0.4s ease; }
+
+/* Number increment animation */
+@keyframes bump { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.bump { animation: bump 0.3s ease; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- Setup Screen -->
+<div class="setup-overlay" id="setupScreen">
+  <div class="setup-logo">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 16l-4-4-4 4" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    罗鸣道减肥记录
+  </div>
+  <div class="setup-title">欢迎开启<br><span>罗鸣道</span>健康之旅</div>
+  <div class="setup-sub">用数据记录每一步改变，<br>让坚持变得可见</div>
+
+  <!-- 激励语录 -->
+  <div class="setup-quote">
+    <div class="quote-icon">💪</div>
+    <div class="quote-text">保持饥饿，做更好更健康的自己</div>
+  </div>
+
+  <div class="setup-step">第 1 / 3 步</div>
+  <div class="setup-field">
+    <div class="setup-label">今日体重（kg）</div>
+    <input class="setup-input" id="s_weight" type="number" step="0.1" min="20" max="300" placeholder="例如 65.5">
+  </div>
+
+  <div class="setup-step" style="margin-top:18px">第 2 / 3 步</div>
+  <div class="setup-field">
+    <div class="setup-label">目标体重（kg）</div>
+    <input class="setup-input" id="s_goal" type="number" step="0.1" min="20" max="300" placeholder="例如 60.0">
+    <div class="setup-hint">建议每月减重 2~4 kg，更健康持久</div>
+  </div>
+
+  <div class="setup-step" style="margin-top:18px">第 3 / 3 步</div>
+  <div class="setup-field">
+    <div class="setup-label">每日步数目标</div>
+    <input class="setup-input" id="s_steps" type="number" step="1000" min="1000" max="50000" placeholder="例如 10000">
+    <div class="setup-hint">世卫组织建议成年人每天 8000~10000 步</div>
+  </div>
+
+  <button class="setup-btn" id="startBtn" onclick="finishSetup()">开始记录 →</button>
+</div>
+
+<!-- Dashboard Page -->
+<div class="page-area" id="page_dash" style="display:none">
+  <div class="header">
+    <div>
+      <div class="header-title">今日 <span>摘要</span></div>
+      <div class="header-sub" id="dash_date"></div>
+    </div>
+    <div class="streak-badge" id="streak_badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2L8.5 11h7L12 2z" fill="currentColor"/><path d="M12 22l3.5-9h-7L12 22z" fill="currentColor" opacity=".6"/></svg>
+      <span id="streak_num">0</span>天连续
+    </div>
+  </div>
+
+  <!-- 每日激励语 -->
+  <div class="daily-quote" id="daily_quote">
+    <span class="quote-tag">今日寄语</span>
+    <div class="quote-content" id="quote_text">保持饥饿，做更好更健康的自己</div>
+  </div>
+
+  <!-- 核心激励语 -->
+  <div class="core-quote">
+    <div class="core-quote-icon">💪</div>
+    <div class="core-quote-text">保持饥饿，做更好更健康的自己</div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="dash-card" onclick="switchTab(1)">
+      <div class="dash-card-icon" style="background:#BBF7D0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="dash-card-val" id="dash_weight" style="color:var(--primary)">--</div>
+      <div class="dash-card-sub">体重（kg）</div>
+      <div class="dash-card-change" id="dash_weight_chg"></div>
+    </div>
+
+    <div class="dash-card" onclick="switchTab(2)">
+      <div class="dash-card-icon" style="background:#E0F2FE">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      </div>
+      <div class="dash-card-val" id="dash_water" style="color:var(--water)">0</div>
+      <div class="dash-card-sub">饮水（杯）</div>
+      <div class="dash-card-change" id="dash_water_pct"></div>
+    </div>
+
+    <div class="dash-card" onclick="switchTab(3)">
+      <div class="dash-card-icon" style="background:#DBEAFE">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2 1.586-1.586a2 2 0 0 1 2.828 0L20 14"/><path d="M6 20h12"/></svg>
+      </div>
+      <div class="dash-card-val" id="dash_steps" style="color:var(--blue)">--</div>
+      <div class="dash-card-sub">步数</div>
+      <div class="dash-card-change" id="dash_steps_chg"></div>
+    </div>
+
+    <div class="dash-card" onclick="switchTab(4)">
+      <div class="dash-card-icon" style="background:#FED7AA">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+      </div>
+      <div class="dash-card-val" id="dash_cal" style="color:var(--accent)">--</div>
+      <div class="dash-card-sub">消耗（kcal）</div>
+      <div class="dash-card-change" id="dash_cal_hint"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      目标进度
+    </div>
+    <div class="stats-row">
+      <div class="stat-chip">
+        <div class="stat-chip-val" id="stat_weight" style="color:var(--primary)">--</div>
+        <div class="stat-chip-lbl">体重变化</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-chip-val" id="stat_water" style="color:var(--water)">--</div>
+        <div class="stat-chip-lbl">饮水完成</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-chip-val" id="stat_steps" style="color:var(--blue)">--</div>
+        <div class="stat-chip-lbl">步数完成</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      最近记录
+    </div>
+    <div id="recent_history" class="history-list"></div>
+  </div>
+</div>
+
+<!-- Weight Page -->
+<div class="page-area" id="page_weight" style="display:none">
+  <div class="header">
+    <div>
+      <div class="header-title">⚖️ <span>体重记录</span></div>
+      <div class="header-sub" id="weight_today"></div>
+    </div>
+  </div>
+
+  <div class="card input-card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      记录今日体重
+    </div>
+    <div class="big-input-wrap">
+      <input class="big-input" id="weight_input" type="number" step="0.1" min="20" max="300" placeholder="0.0">
+      <span class="input-unit">kg</span>
+    </div>
+    <div class="input-row">
+      <button class="btn btn-primary" onclick="saveWeight()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+        保存
+      </button>
+      <button class="btn btn-outline btn-sm" onclick="adjustWeight(-0.1)">−0.1</button>
+      <button class="btn btn-outline btn-sm" onclick="adjustWeight(0.1)">+0.1</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="big-stat">
+      <div class="big-stat-num" id="w_current">--</div>
+      <div class="big-stat-comp">
+        <div>初始 <span id="w_init">--</span> kg</div>
+        <div>目标 <span id="w_goal" style="color:var(--primary)">--</span> kg</div>
+      </div>
+      <div class="dash-card-change" id="w_change" style="font-size:14px;margin-top:8px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      历史记录
+    </div>
+    <div class="history-list" id="weight_history"></div>
+  </div>
+</div>
+
+<!-- Water Page -->
+<div class="page-area" id="page_water" style="display:none">
+  <div class="header">
+    <div>
+      <div class="header-title">💧 <span>饮水记录</span></div>
+      <div class="header-sub" id="water_today"></div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="resetWater()" style="font-size:12px;padding:6px 12px">重置</button>
+  </div>
+
+  <div class="card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      今日饮水
+    </div>
+    <div class="water-ring-wrap">
+      <div class="water-ring-svg">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="65" fill="none" stroke="#E0F2FE" stroke-width="12"/>
+          <circle id="water_progress" cx="80" cy="80" r="65" fill="none" stroke="#0EA5E9" stroke-width="12"
+            stroke-dasharray="408" stroke-dashoffset="408"
+            stroke-linecap="round"
+            style="transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1), stroke 0.3s"/>
+        </svg>
+        <div class="water-ring-text">
+          <div class="water-ring-num" id="water_num">0</div>
+          <div class="water-ring-label">杯</div>
+        </div>
+      </div>
+    </div>
+    <div class="water-cups" id="cup_btns"></div>
+    <div class="water-tip">💡 建议少量多次，每次1~2杯<br>目标：<span id="water_goal">8</span> 杯（约2000ml）</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      记录历史
+    </div>
+    <div class="history-list" id="water_history"></div>
+  </div>
+</div>
+
+<!-- Steps Page -->
+<div class="page-area" id="page_steps" style="display:none">
+  <div class="header">
+    <div>
+      <div class="header-title">👟 <span>步数记录</span></div>
+      <div class="header-sub" id="steps_today"></div>
+    </div>
+  </div>
+
+  <div class="card input-card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2 1.586-1.586a2 2 0 0 1 2.828 0L20 14"/><path d="M6 20h12"/></svg>
+      记录今日步数
+    </div>
+    <div class="big-input-wrap">
+      <input class="big-input" id="steps_input" type="number" step="100" min="0" max="100000" placeholder="0">
+    </div>
+    <div class="input-row">
+      <button class="btn btn-primary" onclick="saveSteps()" style="background:var(--blue);box-shadow:0 4px 12px rgba(59,130,246,0.35)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+        保存
+      </button>
+      <button class="btn btn-outline btn-sm" onclick="adjustSteps(-500)">−500</button>
+      <button class="btn btn-outline btn-sm" onclick="adjustSteps(500)">+500</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      今日目标
+    </div>
+    <div class="step-ring">
+      <div class="step-display">
+        <div class="step-num" id="steps_current">--</div>
+        <div class="step-goal">目标 <span id="steps_goal_text">10000</span> 步</div>
+      </div>
+    </div>
+    <div class="progress-bar-wrap" style="padding:0 8px">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="steps_bar" style="width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-light);margin-top:4px;padding:0 2px">
+        <span id="steps_pct">0%</span>
+        <span>达标</span>
+      </div>
+    </div>
+    <div class="step-extra">
+      <div class="step-extra-item">
+        <div class="step-extra-val" id="steps_cal">0</div>
+        <div class="step-extra-lbl">消耗 kcal</div>
+      </div>
+      <div class="step-extra-item">
+        <div class="step-extra-val" id="steps_streak">0</div>
+        <div class="step-extra-lbl">连续达标天</div>
+      </div>
+      <div class="step-extra-item">
+        <div class="step-extra-val" id="steps_dist">0</div>
+        <div class="step-extra-lbl">约公里</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      记录历史
+    </div>
+    <div class="history-list" id="steps_history"></div>
+  </div>
+</div>
+
+<!-- Trends Page -->
+<div class="page-area" id="page_trends" style="display:none">
+  <div class="header">
+    <div>
+      <div class="header-title">📈 <span>趋势分析</span></div>
+      <div class="header-sub">近30天数据</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="exportData()" style="font-size:12px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      导出
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      体重趋势
+    </div>
+    <div class="chart-wrap">
+      <canvas id="weightChart" height="200"></canvas>
+    </div>
+    <div id="weight_summary" style="font-size:12px;color:var(--text-light);text-align:center;margin-top:4px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      饮水量趋势
+    </div>
+    <div class="chart-wrap">
+      <canvas id="waterChart" height="160"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2 1.586-1.586a2 2 0 0 1 2.828 0L20 14"/><path d="M6 20h12"/></svg>
+      步数趋势
+    </div>
+    <div class="chart-wrap">
+      <canvas id="stepsChart" height="160"></canvas>
+    </div>
+  </div>
+
+  <div class="card" style="background:#FEF2F2;border-color:#FECACA">
+    <div class="card-label" style="color:var(--red)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      数据管理
+    </div>
+    <div class="input-row">
+      <button class="btn btn-outline" style="flex:1;border-color:#FECACA;color:var(--red);justify-content:center" onclick="exportData()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        导出 CSV
+      </button>
+      <button class="btn btn-danger" style="flex:1;justify-content:center" onclick="confirmClear()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        清除全部
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav" id="bottomNav" style="display:none">
+  <button class="nav-item active" onclick="switchTab(0)" id="nav0">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+    <span class="nav-label">今日</span>
+  </button>
+  <button class="nav-item" onclick="switchTab(1)" id="nav1">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    <span class="nav-label">体重</span>
+  </button>
+  <button class="nav-item" onclick="switchTab(2)" id="nav2">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+    </svg>
+    <span class="nav-label">饮水</span>
+  </button>
+  <button class="nav-item" onclick="switchTab(3)" id="nav3">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2 1.586-1.586a2 2 0 0 1 2.828 0L20 14"/>
+      <path d="M6 20h12"/>
+    </svg>
+    <span class="nav-label">步数</span>
+  </button>
+  <button class="nav-item" onclick="switchTab(4)" id="nav4">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+    </svg>
+    <span class="nav-label">趋势</span>
+  </button>
+</nav>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ==================== DATA ====================
+const STORAGE_KEY = 'fittrack_data';
+const TODAY = () => new Date().toISOString().slice(0, 10);
+
+function getDefaultData() {
+  return {
+    goalWeight: null,
+    initWeight: null,
+    stepGoal: 10000,
+    waterGoal: 8,
+    weights: {},    // date -> { weight }
+    waters: {},     // date -> { cups }
+    steps: {},      // date -> { steps }
+    streak: { weight: 0, steps: 0 }
+  };
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch(e) { return null; }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+let appData = loadData();
+
+// ==================== SETUP ====================
+function finishSetup() {
+  const w = parseFloat(document.getElementById('s_weight').value);
+  const g = parseFloat(document.getElementById('s_goal').value);
+  const s = parseInt(document.getElementById('s_steps').value);
+
+  if (!w || w < 20 || w > 300) { showToast('请输入有效体重（20~300 kg）'); return; }
+  if (!g || g < 20 || g > 300) { showToast('请输入有效目标体重'); return; }
+  if (!s || s < 1000) { showToast('请输入有效步数目标（≥1000）'); return; }
+
+  appData = getDefaultData();
+  appData.goalWeight = g;
+  appData.initWeight = w;
+  appData.stepGoal = s;
+  const date = TODAY();
+  appData.weights[date] = { weight: w };
+  appData.waters[date] = { cups: 0 };
+  appData.steps[date] = { steps: 0 };
+  saveData(appData);
+
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('bottomNav').style.display = 'flex';
+  switchTab(0);
+  showToast('✅ 初始化完成，开始记录吧！');
+}
+
+// ==================== NAVIGATION ====================
+function switchTab(idx) {
+  document.querySelectorAll('.page-area').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`nav${idx}`).classList.add('active');
+
+  const pages = ['page_dash','page_weight','page_water','page_steps','page_trends'];
+  const el = document.getElementById(pages[idx]);
+  el.style.display = 'block';
+
+  if (idx === 0) renderDash();
+  if (idx === 1) renderWeight();
+  if (idx === 2) renderWater();
+  if (idx === 3) renderSteps();
+  if (idx === 4) renderTrends();
+}
+
+// ==================== TOAST ====================
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ==================== DASHBOARD ====================
+function fmt(n, dec=1) {
+  if (n === null || n === undefined || isNaN(n)) return '--';
+  return typeof n === 'number' ? n.toFixed(dec) : n;
+}
+function fmtDate(d) {
+  const mo = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const wd = ['周日','周一','周二','周三','周四','周五','周六'];
+  const dt = new Date(d + 'T12:00:00');
+  return `${dt.getMonth()+1}月${dt.getDate()}日 ${wd[dt.getDay()]}`;
+}
+function dateStr(daysAgo=0) {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return d.toISOString().slice(0, 10);
+}
+
+function renderDash() {
+  const today = TODAY();
+  document.getElementById('dash_date').textContent = fmtDate(today);
+  
+  // 每日激励语
+  document.getElementById('quote_text').textContent = getDailyQuote();
+
+  // Weight
+  const w = appData.weights[today]?.weight;
+  document.getElementById('dash_weight').textContent = fmt(w);
+  const diff = w && appData.initWeight ? (w - appData.initWeight) : null;
+  const wChg = document.getElementById('dash_weight_chg');
+  if (diff !== null) {
+    const sign = diff <= 0 ? '↓' : '↑';
+    wChg.innerHTML = `${sign} ${Math.abs(diff).toFixed(1)} kg vs 初始`;
+    wChg.className = 'dash-card-change ' + (diff <= 0 ? 'positive' : 'negative');
+  } else { wChg.textContent = ''; wChg.className = 'dash-card-change neutral'; }
+
+  // Water
+  const wc = appData.waters[today]?.cups ?? 0;
+  document.getElementById('dash_water').textContent = wc;
+  const wPct = Math.round((wc / appData.waterGoal) * 100);
+  document.getElementById('dash_water_pct').textContent = `${wPct}% 完成`;
+  document.getElementById('dash_water_pct').className = 'dash-card-change ' + (wPct >= 100 ? 'positive' : 'neutral');
+
+  // Steps
+  const st = appData.steps[today]?.steps;
+  document.getElementById('dash_steps').textContent = st !== undefined && st !== null ? st.toLocaleString() : '--';
+  const stPct = st ? Math.round((st / appData.stepGoal) * 100) : 0;
+  document.getElementById('dash_steps_chg').textContent = st ? `${stPct}% 完成` : '';
+  document.getElementById('dash_steps_chg').className = 'dash-card-change ' + (stPct >= 100 ? 'positive' : 'neutral');
+
+  // Calories
+  const cal = st ? Math.round(st * 0.04) : null;
+  document.getElementById('dash_cal').textContent = cal ? cal.toLocaleString() : '--';
+  document.getElementById('dash_cal_hint').textContent = st ? `约消耗 ${cal} kcal` : '';
+  document.getElementById('dash_cal_hint').className = 'dash-card-change neutral';
+
+  // Stats row
+  document.getElementById('stat_weight').textContent = diff !== null ? (diff <= 0 ? `${Math.abs(diff)} ↓` : `+${diff.toFixed(1)}`) : '--';
+  if (diff !== null) document.getElementById('stat_weight').style.color = diff <= 0 ? 'var(--primary)' : 'var(--red)';
+  document.getElementById('stat_water').textContent = wPct + '%';
+  document.getElementById('stat_water').style.color = wPct >= 100 ? 'var(--primary)' : 'var(--water)';
+  document.getElementById('stat_steps').textContent = stPct + '%';
+  document.getElementById('stat_steps').style.color = stPct >= 100 ? 'var(--primary)' : 'var(--blue)';
+
+  // Streak
+  document.getElementById('streak_num').textContent = appData.streak?.weight || 0;
+
+  // Recent history (last 5 entries)
+  const recentEl = document.getElementById('recent_history');
+  const allEntries = [];
+  Object.keys(appData.weights).forEach(d => allEntries.push({ type: 'weight', date: d, val: appData.weights[d].weight }));
+  Object.keys(appData.waters).forEach(d => { if (!allEntries.find(e => e.type === 'water' && e.date === d)) allEntries.push({ type: 'water', date: d, val: appData.waters[d].cups }); });
+  Object.keys(appData.steps).forEach(d => { if (!allEntries.find(e => e.type === 'steps' && e.date === d)) allEntries.push({ type: 'steps', date: d, val: appData.steps[d].steps }); });
+  allEntries.sort((a, b) => b.date.localeCompare(a.date));
+  const recent = allEntries.slice(0, 6);
+
+  if (recent.length === 0) {
+    recentEl.innerHTML = '<div class="history-empty"><div class="history-empty-icon">📋</div>暂无记录</div>';
+  } else {
+    recentEl.innerHTML = recent.map(r => {
+      const icon = r.type === 'weight' ? '⚖️' : r.type === 'water' ? '💧' : '👟';
+      const unit = r.type === 'weight' ? 'kg' : r.type === 'water' ? '杯' : '步';
+      const val = r.type === 'steps' ? Number(r.val).toLocaleString() : r.val;
+      return `<div class="history-item">
+        <div><div class="history-date">${fmtDate(r.date)}</div><div style="font-size:12px;color:var(--text-light);margin-top:1px">${icon} ${r.type === 'weight' ? '体重' : r.type === 'water' ? '饮水' : '步数'}</div></div>
+        <div style="font-family:'DM Sans';font-size:15px;font-weight:700">${val} ${unit}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ==================== WEIGHT ====================
+function renderWeight() {
+  const today = TODAY();
+  document.getElementById('weight_today').textContent = fmtDate(today);
+
+  const w = appData.weights[today]?.weight;
+  document.getElementById('w_current').textContent = fmt(w);
+  document.getElementById('w_init').textContent = fmt(appData.initWeight);
+  document.getElementById('w_goal').textContent = fmt(appData.goalWeight);
+
+  const diff = w && appData.initWeight ? (w - appData.initWeight) : null;
+  const wChange = document.getElementById('w_change');
+  if (diff !== null) {
+    const emoji = diff <= 0 ? '🎉' : '📈';
+    const cls = diff <= 0 ? 'positive' : 'negative';
+    wChange.innerHTML = `${emoji} 较初始 ${diff <= 0 ? '下降' : '上升'} ${Math.abs(diff).toFixed(1)} kg，距目标还 ${(w - appData.goalWeight).toFixed(1)} kg`;
+    wChange.className = 'dash-card-change ' + cls;
+  } else {
+    wChange.textContent = '今日尚未记录体重';
+    wChange.className = 'dash-card-change neutral';
+  }
+
+  // History
+  const sorted = Object.entries(appData.weights).sort((a, b) => b[0].localeCompare(a[0]));
+  const histEl = document.getElementById('weight_history');
+  if (sorted.length === 0) {
+    histEl.innerHTML = '<div class="history-empty"><div class="history-empty-icon">⚖️</div>暂无记录</div>';
+  } else {
+    histEl.innerHTML = sorted.map(([date, d]) => {
+      const prev = sorted.find(([od]) => od < date);
+      const prevVal = prev ? appData.weights[prev[0]]?.weight : null;
+      const chg = prevVal ? (d.weight - prevVal) : null;
+      const chgHtml = chg !== null ? `<span class="history-change ${chg <= 0 ? 'positive' : 'negative'}">${chg <= 0 ? '' : '+'}${chg.toFixed(1)}</span>` : '<span class="history-change neutral">—</span>';
+      return `<div class="history-item">
+        <div class="history-date">${fmtDate(date)}</div>
+        <div class="history-val">${d.weight} kg</div>
+        ${chgHtml}
+        <button class="history-del" onclick="delWeight('${date}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+    }).join('');
+  }
+}
+
+function saveWeight() {
+  const val = parseFloat(document.getElementById('weight_input').value);
+  if (!val || val < 20 || val > 300) { showToast('请输入有效体重（20~300）'); return; }
+  const today = TODAY();
+  if (!appData.initWeight) appData.initWeight = val;
+  appData.weights[today] = { weight: val };
+  if (!appData.goalWeight) { showToast('请在趋势页设置目标体重'); }
+  saveData(appData);
+  document.getElementById('weight_input').value = '';
+  renderWeight();
+  showToast('✅ 体重已保存！');
+  // Bump animation
+  document.getElementById('w_current').classList.add('bump');
+  setTimeout(() => document.getElementById('w_current').classList.remove('bump'), 400);
+}
+
+function adjustWeight(delta) {
+  const inp = document.getElementById('weight_input');
+  let cur = parseFloat(inp.value) || 0;
+  inp.value = Math.max(20, Math.min(300, +(cur + delta).toFixed(1)));
+}
+
+function delWeight(date) {
+  delete appData.weights[date];
+  saveData(appData);
+  renderWeight();
+  showToast('已删除');
+}
+
+// ==================== WATER ====================
+function renderWater() {
+  const today = TODAY();
+  document.getElementById('water_today').textContent = fmtDate(today);
+  document.getElementById('water_goal').textContent = appData.waterGoal;
+
+  const cups = appData.waters[today]?.cups ?? 0;
+  document.getElementById('water_num').textContent = cups;
+
+  // Ring progress
+  const circumference = 2 * Math.PI * 65; // ~408
+  const pct = Math.min(cups / appData.waterGoal, 1);
+  const offset = circumference * (1 - pct);
+  const ring = document.getElementById('water_progress');
+  ring.style.strokeDashoffset = offset;
+  ring.style.stroke = cups >= appData.waterGoal ? 'var(--primary)' : 'var(--water)';
+
+  // Cup buttons
+  const cupWrap = document.getElementById('cup_btns');
+  cupWrap.innerHTML = '';
+  for (let i = 1; i <= 12; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'cup-btn' + (i <= cups ? ' filled' : '');
+    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="${i <= cups ? 'white' : 'none'}" stroke="${i <= cups ? 'white' : '#0EA5E9'}" stroke-width="1.8"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
+    btn.onclick = () => addCup(i > cups ? 1 : -1, i);
+    cupWrap.appendChild(btn);
+  }
+
+  // History
+  const sorted = Object.entries(appData.waters).sort((a, b) => b[0].localeCompare(a[0]));
+  const histEl = document.getElementById('water_history');
+  if (sorted.length === 0) {
+    histEl.innerHTML = '<div class="history-empty"><div class="history-empty-icon">💧</div>暂无记录</div>';
+  } else {
+    histEl.innerHTML = sorted.slice(0, 20).map(([date, d]) => {
+      const pct = Math.round((d.cups / appData.waterGoal) * 100);
+      return `<div class="history-item">
+        <div class="history-date">${fmtDate(date)}</div>
+        <div class="history-val" style="color:var(--water)">${d.cups} 杯</div>
+        <span class="history-change ${pct >= 100 ? 'positive' : 'neutral'}">${pct}%</span>
+        <button class="history-del" onclick="delWater('${date}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+    }).join('');
+  }
+}
+
+function addCup(delta, target) {
+  const today = TODAY();
+  const cur = appData.waters[today]?.cups ?? 0;
+  const next = Math.max(0, Math.min(12, cur + delta));
+  appData.waters[today] = { cups: next };
+  saveData(appData);
+  renderWater();
+  if (delta > 0 && next === appData.waterGoal) showToast('🎉 今日饮水目标达成！');
+}
+
+function resetWater() {
+  const today = TODAY();
+  appData.waters[today] = { cups: 0 };
+  saveData(appData);
+  renderWater();
+  showToast('饮水已重置');
+}
+
+function delWater(date) {
+  delete appData.waters[date];
+  saveData(appData);
+  renderWater();
+  showToast('已删除');
+}
+
+// ==================== STEPS ====================
+function renderSteps() {
+  const today = TODAY();
+  document.getElementById('steps_today').textContent = fmtDate(today);
+  document.getElementById('steps_goal_text').textContent = appData.stepGoal.toLocaleString();
+
+  const st = appData.steps[today]?.steps;
+  document.getElementById('steps_current').textContent = st !== undefined && st !== null ? Number(st).toLocaleString() : '--';
+  const pct = st ? Math.min(Math.round((st / appData.stepGoal) * 100), 100) : 0;
+  document.getElementById('steps_bar').style.width = pct + '%';
+  document.getElementById('steps_pct').textContent = pct + '%';
+
+  const cal = st ? Math.round(st * 0.04) : 0;
+  const dist = st ? (st * 0.0007).toFixed(1) : 0; // ~0.7m per step
+  document.getElementById('steps_cal').textContent = cal.toLocaleString();
+  document.getElementById('steps_dist').textContent = dist;
+
+  // Streak
+  document.getElementById('steps_streak').textContent = appData.streak?.steps || 0;
+
+  // History
+  const sorted = Object.entries(appData.steps).sort((a, b) => b[0].localeCompare(a[0]));
+  const histEl = document.getElementById('steps_history');
+  if (sorted.length === 0) {
+    histEl.innerHTML = '<div class="history-empty"><div class="history-empty-icon">👟</div>暂无记录</div>';
+  } else {
+    histEl.innerHTML = sorted.slice(0, 20).map(([date, d]) => {
+      const p = Math.round((d.steps / appData.stepGoal) * 100);
+      const reached = p >= 100;
+      return `<div class="history-item">
+        <div class="history-date">${fmtDate(date)}</div>
+        <div class="history-val" style="color:var(--blue)">${Number(d.steps).toLocaleString()} 步</div>
+        <span class="history-change ${reached ? 'positive' : 'neutral'}">${p}%</span>
+        <button class="history-del" onclick="delSteps('${date}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+    }).join('');
+  }
+}
+
+function saveSteps() {
+  const val = parseInt(document.getElementById('steps_input').value);
+  if (!val || val < 0) { showToast('请输入有效步数'); return; }
+  const today = TODAY();
+  appData.steps[today] = { steps: val };
+
+  // Update streak
+  const yesterday = dateStr(1);
+  const yesterdaySteps = appData.steps[yesterday]?.steps ?? 0;
+  const prevStreak = appData.streak?.steps || 0;
+  if (val >= appData.stepGoal) {
+    if (yesterdaySteps >= appData.stepGoal) {
+      appData.streak = appData.streak || {};
+      appData.streak.steps = prevStreak + 1;
+    } else {
+      appData.streak = appData.streak || {};
+      appData.streak.steps = 1;
+    }
+  } else {
+    appData.streak = appData.streak || {};
+    appData.streak.steps = 0;
+  }
+
+  saveData(appData);
+  document.getElementById('steps_input').value = '';
+  renderSteps();
+  if (val >= appData.stepGoal) showToast('🎉 今日步数目标达成！');
+  else showToast('✅ 步数已保存');
+  document.getElementById('steps_current').classList.add('bump');
+  setTimeout(() => document.getElementById('steps_current').classList.remove('bump'), 400);
+}
+
+function adjustSteps(delta) {
+  const inp = document.getElementById('steps_input');
+  let cur = parseInt(inp.value) || 0;
+  inp.value = Math.max(0, cur + delta);
+}
+
+function delSteps(date) {
+  delete appData.steps[date];
+  saveData(appData);
+  renderSteps();
+  showToast('已删除');
+}
+
+// ==================== TRENDS ====================
+let wChart, waChart, sChart;
+
+function renderTrends() {
+  renderWeightChart();
+  renderWaterChart();
+  renderStepsChart();
+}
+
+function getLast30Days() {
+  const days = [];
+  for (let i = 29; i >= 0; i--) days.push(dateStr(i));
+  return days;
+}
+
+function renderWeightChart() {
+  const ctx = document.getElementById('weightChart').getContext('2d');
+  if (wChart) wChart.destroy();
+  const days = getLast30Days();
+  const weights = days.map(d => appData.weights[d]?.weight ?? null);
+  const hasData = weights.some(w => w !== null);
+  const valid = weights.filter(w => w !== null);
+  const minW = valid.length ? Math.min(...valid) - 2 : 50;
+  const maxW = valid.length ? Math.max(...valid) + 2 : 100;
+
+  document.getElementById('weight_summary').textContent = hasData
+    ? `范围: ${Math.min(...valid).toFixed(1)} ~ ${Math.max(...valid).toFixed(1)} kg`
+    : '暂无数据，记录体重后可见趋势';
+
+  wChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: days.map(d => {
+        const dt = new Date(d + 'T12:00:00');
+        return `${dt.getMonth()+1}/${dt.getDate()}`;
+      }),
+      datasets: [{
+        label: '体重(kg)',
+        data: weights,
+        borderColor: '#22C55E',
+        backgroundColor: 'rgba(34,197,94,0.08)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointBackgroundColor: '#22C55E',
+        spanGaps: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `体重: ${ctx.raw} kg`,
+            afterLabel: () => appData.goalWeight ? `目标: ${appData.goalWeight} kg` : ''
+          }
+        }
+      },
+      scales: {
+        y: { min: minW, max: maxW, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 } } },
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 7, font: { size: 10 } } }
+      }
+    }
+  });
+
+  // Draw goal line if set
+  if (appData.goalWeight) {
+    wChart.options.plugins.annotation = {
+      annotations: {
+        goal: {
+          type: 'line',
+          yMin: appData.goalWeight,
+          yMax: appData.goalWeight,
+          borderColor: '#22C55E',
+          borderWidth: 1.5,
+          borderDash: [5, 5],
+          label: { content: '目标', enabled: true }
+        }
+      }
+    };
+  }
+}
+
+function renderWaterChart() {
+  const ctx = document.getElementById('waterChart').getContext('2d');
+  if (waChart) waChart.destroy();
+  const days = getLast30Days();
+  const cups = days.map(d => appData.waters[d]?.cups ?? 0);
+
+  waChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: days.map(d => {
+        const dt = new Date(d + 'T12:00:00');
+        return `${dt.getMonth()+1}/${dt.getDate()}`;
+      }),
+      datasets: [{
+        label: '饮水量(杯)',
+        data: cups,
+        backgroundColor: cups.map(c => c >= appData.waterGoal ? 'rgba(14,165,233,0.9)' : 'rgba(14,165,233,0.35)'),
+        borderRadius: 4,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `饮水: ${ctx.raw} 杯`
+          }
+        }
+      },
+      scales: {
+        y: { beginAtZero: true, max: Math.max(appData.waterGoal + 2, ...cups) + 2, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 } } },
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 7, font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function renderStepsChart() {
+  const ctx = document.getElementById('stepsChart').getContext('2d');
+  if (sChart) sChart.destroy();
+  const days = getLast30Days();
+  const steps = days.map(d => appData.steps[d]?.steps ?? null);
+  const valid = steps.filter(s => s !== null);
+  const maxSteps = valid.length ? Math.max(...valid, appData.stepGoal) * 1.1 : appData.stepGoal * 1.1;
+
+  sChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: days.map(d => {
+        const dt = new Date(d + 'T12:00:00');
+        return `${dt.getMonth()+1}/${dt.getDate()}`;
+      }),
+      datasets: [
+        {
+          label: '步数',
+          data: steps,
+          borderColor: '#3B82F6',
+          backgroundColor: 'rgba(59,130,246,0.08)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 3,
+          pointBackgroundColor: '#3B82F6',
+          spanGaps: true
+        },
+        {
+          label: '目标',
+          data: steps.map(() => appData.stepGoal),
+          borderColor: 'rgba(249,115,22,0.5)',
+          borderDash: [5, 5],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: false,
+          tension: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.datasetIndex === 0 ? `步数: ${Number(ctx.raw).toLocaleString()}` : `目标: ${appData.stepGoal.toLocaleString()}`
+          }
+        }
+      },
+      scales: {
+        y: { beginAtZero: true, max: maxSteps, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 }, callback: v => (v/1000) + 'k' } },
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 7, font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+// ==================== EXPORT ====================
+function exportData() {
+  let csv = '类型,日期,数值,备注\n';
+  Object.entries(appData.weights).forEach(([d, v]) => { csv += `体重,${d},${v.weight},kg\n`; });
+  Object.entries(appData.waters).forEach(([d, v]) => { csv += `饮水,${d},${v.cups},杯\n`; });
+  Object.entries(appData.steps).forEach(([d, v]) => { csv += `步数,${d},${v.steps},步\n`; });
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8-sig;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `FitTrack_数据导出_${TODAY()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📥 数据已导出为 CSV');
+}
+
+function confirmClear() {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-title">⚠️ 确认清除全部数据？</div>
+      <div class="modal-body">此操作不可恢复，将删除所有体重、饮水和步数记录。</div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">取消</button>
+        <button class="btn btn-danger" onclick="clearAllData()">确认清除</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
+
+function clearAllData() {
+  localStorage.removeItem(STORAGE_KEY);
+  appData = getDefaultData();
+  document.querySelectorAll('.modal-overlay').forEach(el => el.remove());
+  showToast('已清除全部数据');
+  switchTab(0);
+}
+
+// ==================== QUOTES ====================
+const QUOTES = [
+  "保持饥饿，做更好更健康的自己",
+  "每一滴汗水都是脂肪的眼泪",
+  "今天不努力，明天变垃圾",
+  "你不是在减肥，你是在变优秀",
+  "控制不了体重，何以控制人生",
+  "瘦下来，世界都是你的",
+  "饿了才能瘦，困了才能高",
+  "坚持就是胜利，放弃只需一秒",
+  "今天少吃一口，明天美过所有",
+  "不是在绝食，是在重生",
+  "饿是瘦的开始，困是美的起点",
+  "对自己狠一点，世界对你温柔一点",
+  "减肥是最好的整形",
+  "空腹是对身体最好的尊重",
+  "少吃不等于亏待自己",
+  "每一次饥饿都是蜕变的开始",
+  "你在饿瘦，更在变好",
+  "瘦下来的人生有多爽",
+  "汗水不会骗人，脂肪会消失",
+  "自律的人才配有身材",
+  "饿了别投降，瘦了别骄傲",
+  "减肥是一场与自己的战争",
+  "坚持难但值得，放弃易却后悔",
+  "要么瘦，要么更瘦",
+  "管住嘴，迈开腿",
+  "饿着饿着就瘦了",
+  "今日饿肚，明日秀腹",
+  "对自己负责，对脂肪无情",
+  "要么瘦要么死",
+  "不是在饿，是在变好"
+];
+
+function getDailyQuote() {
+  const day = new Date().getDate();
+  return QUOTES[(day - 1) % QUOTES.length];
+}
+
+// ==================== INIT ====================
+function init() {
+  if (!appData || !appData.initWeight) {
+    document.getElementById('setupScreen').style.display = 'flex';
+    document.getElementById('bottomNav').style.display = 'none';
+  } else {
+    document.getElementById('setupScreen').style.display = 'none';
+    document.getElementById('bottomNav').style.display = 'flex';
+    switchTab(0);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
