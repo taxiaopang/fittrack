@@ -38,71 +38,95 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC
 .card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);border:1px solid var(--border)}
 .card-title{font-size:15px;font-weight:600;color:var(--text-secondary);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 
-/* Home Tab - Weight Display */
-.weight-card{text-align:center;padding:30px 20px;background:linear-gradient(145deg,var(--primary),var(--primary-dark));color:#fff;border-radius:var(--radius);margin-bottom:16px}
-.weight-value{font-size:72px;font-weight:700;line-height:1}
-.weight-unit{font-size:20px;opacity:0.9;margin-left:4px}
-.weight-change{margin-top:12px;font-size:14px;opacity:0.95}
-.weight-change .arrow{font-size:18px;margin-right:4px}
+/* Home Tab */
+.welcome-card{text-align:center;padding:30px 20px;background:linear-gradient(145deg,var(--primary),var(--primary-dark));color:#fff;border-radius:var(--radius);margin-bottom:16px}
+.welcome-card h2{font-size:24px;font-weight:700;margin-bottom:8px}
+.welcome-card p{font-size:14px;opacity:0.9}
 
-.input-wrap{background:#fff;border-radius:var(--radius-sm);padding:4px;display:flex;gap:8px;margin-top:20px}
-.input-wrap input{flex:1;border:none;background:transparent;padding:14px;font-size:18px;outline:none;color:var(--text)}
-.input-wrap input::placeholder{color:#94a3b8}
-.btn-white{background:#fff;color:var(--primary);border:none;padding:14px 28px;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer}
-.btn-white:active{transform:scale(0.98)}
-
-.quick-actions{display:flex;gap:10px;margin-top:16px}
-.quick-actions button{flex:1;padding:12px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);border-radius:10px;font-size:14px;color:#fff;cursor:pointer}
-.quick-actions button:active{background:rgba(255,255,255,0.2)}
-
-/* Stats Grid */
 .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .stat-item{background:var(--card);border-radius:var(--radius-sm);padding:20px;text-align:center;border:1px solid var(--border)}
 .stat-value{font-size:28px;font-weight:700;color:var(--primary)}
 .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px}
 
-/* Chart */
-.chart-container{position:relative;height:240px;margin-top:8px}
+.quick-entry{display:flex;gap:12px;margin-top:16px}
+.quick-entry button{flex:1;padding:16px;border:none;background:var(--card);border-radius:var(--radius-sm);font-size:14px;font-weight:600;color:var(--text);cursor:pointer;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:6px}
+.quick-entry button .icon{font-size:24px}
+.quick-entry button:active{background:#f8fafc}
 
-/* Track Cards */
-.track-card{display:flex;align-items:center;gap:16px;padding:20px;background:var(--card);border-radius:var(--radius);margin-bottom:12px;border:1px solid var(--border)}
-.track-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--primary-light)}
-.track-info{flex:1}
-.track-title{font-size:16px;font-weight:600;color:var(--text)}
-.track-value{font-size:32px;font-weight:700;color:var(--primary);margin-top:4px}
-.track-unit{font-size:14px;color:var(--text-secondary);margin-left:4px}
-.track-btn{width:44px;height:44px;border-radius:50%;border:none;background:var(--primary);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(16,185,129,0.3)}
-.track-btn:active{transform:scale(0.95)}
+/* Weight Tab */
+.weight-card{text-align:center;padding:40px 20px;background:linear-gradient(145deg,var(--primary),var(--primary-dark));color:#fff;border-radius:var(--radius);margin-bottom:16px}
+.weight-value{font-size:80px;font-weight:700;line-height:1}
+.weight-unit{font-size:20px;opacity:0.9;margin-left:4px}
+.weight-change{margin-top:16px;font-size:15px;opacity:0.95;padding:8px 16px;background:rgba(255,255,255,0.15);border-radius:20px;display:inline-block}
 
-.track-input{flex:1;display:flex;gap:8px}
-.track-input input{flex:1;padding:14px;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:16px;outline:none}
-.track-input input:focus{border-color:var(--primary)}
-.track-input button{padding:14px 20px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer}
+.input-wrap{background:#fff;border-radius:var(--radius-sm);padding:4px;display:flex;gap:8px;margin-top:24px}
+.input-wrap input{flex:1;border:none;background:transparent;padding:14px;font-size:18px;outline:none;color:var(--text)}
+.input-wrap input::placeholder{color:#94a3b8}
+.btn-white{background:#fff;color:var(--primary);border:none;padding:14px 28px;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer}
+.btn-white:active{transform:scale(0.98)}
 
-/* History */
-.history-list{max-height:calc(100vh - 280px);overflow-y:auto}
+.adjust-btns{display:flex;gap:10px;margin-top:16px}
+.adjust-btns button{flex:1;padding:12px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);border-radius:10px;font-size:14px;color:#fff;cursor:pointer}
+.adjust-btns button:active{background:rgba(255,255,255,0.2)}
+
+/* Steps Tab */
+.steps-display{text-align:center;padding:30px;background:var(--card);border-radius:var(--radius);margin-bottom:16px;border:1px solid var(--border)}
+.steps-icon{font-size:48px;margin-bottom:12px}
+.steps-value{font-size:56px;font-weight:700;color:var(--primary)}
+.steps-label{font-size:14px;color:var(--text-secondary);margin-top:4px}
+.steps-goal{font-size:13px;color:var(--primary);margin-top:8px;padding:6px 16px;background:var(--primary-light);border-radius:16px;display:inline-block}
+
+.steps-input-card{padding:20px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border)}
+.steps-input-card h3{font-size:16px;margin-bottom:16px;color:var(--text)}
+.steps-input-wrap{display:flex;gap:12px;margin-bottom:16px}
+.steps-input-wrap input{flex:1;padding:16px;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:18px;outline:none;text-align:center}
+.steps-input-wrap input:focus{border-color:var(--primary)}
+.steps-input-wrap button{padding:16px 32px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:600;cursor:pointer}
+
+.quick-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.quick-steps button{padding:12px;border:1px solid var(--border);background:var(--card);border-radius:var(--radius-sm);font-size:14px;color:var(--text);cursor:pointer}
+.quick-steps button:active{background:#f8fafc}
+
+/* Water Tab */
+.water-display{text-align:center;padding:30px;background:var(--card);border-radius:var(--radius);margin-bottom:16px;border:1px solid var(--border)}
+.water-icon{font-size:48px;margin-bottom:12px}
+.water-value{font-size:56px;font-weight:700;color:var(--primary)}
+.water-label{font-size:14px;color:var(--text-secondary);margin-top:4px}
+.water-cups{display:flex;justify-content:center;gap:8px;margin-top:16px;flex-wrap:wrap}
+.water-cup{width:32px;height:32px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:14px}
+.water-cup.filled{background:var(--primary);color:#fff}
+
+.water-controls{display:flex;gap:16px;justify-content:center;margin-top:20px}
+.water-btn{width:64px;height:64px;border-radius:50%;border:none;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.water-btn.minus{background:#f1f5f9;color:var(--text)}
+.water-btn.plus{background:var(--primary);color:#fff;box-shadow:0 4px 16px rgba(16,185,129,0.35)}
+.water-btn:active{transform:scale(0.95)}
+
+.water-tips{background:linear-gradient(135deg,var(--primary-light),#ecfdf5);border-radius:var(--radius);padding:20px;border:1px solid #bbf7d0}
+.water-tips h4{font-size:15px;font-weight:600;color:var(--primary-dark);margin-bottom:8px}
+.water-tips p{font-size:14px;color:#166534;line-height:1.7}
+
+/* Trend Tab */
+.chart-container{position:relative;height:260px;margin-top:8px}
+
+.trend-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+.trend-stat{background:var(--card);border-radius:var(--radius-sm);padding:18px;text-align:center;border:1px solid var(--border)}
+.trend-stat-value{font-size:24px;font-weight:700;color:var(--primary)}
+.trend-stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px}
+
+/* History List (for all tabs) */
+.history-list{max-height:calc(100vh - 220px);overflow-y:auto}
 .history-item{display:flex;align-items:center;justify-content:space-between;padding:16px;background:var(--card);border-radius:var(--radius-sm);margin-bottom:10px;border:1px solid var(--border)}
 .history-date{display:flex;flex-direction:column}
 .history-date .day{font-size:15px;font-weight:600;color:var(--text)}
 .history-date .weekday{font-size:12px;color:var(--text-secondary);margin-top:2px}
 .history-right{text-align:right}
-.history-weight{font-size:20px;font-weight:700;color:var(--primary)}
+.history-value{font-size:20px;font-weight:700;color:var(--primary)}
 .history-diff{font-size:12px;margin-top:4px;padding:4px 10px;border-radius:12px;display:inline-block}
 .history-diff.down{background:var(--primary-light);color:var(--primary-dark)}
 .history-diff.up{background:#fef2f2;color:#dc2626}
 
-/* Settings */
-.setting-item{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:var(--card);border-radius:var(--radius-sm);margin-bottom:12px;border:1px solid var(--border);cursor:pointer}
-.setting-item:active{background:#f8fafc}
-.setting-left{display:flex;align-items:center;gap:14px}
-.setting-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:#f1f5f9}
-.setting-title{font-size:15px;font-weight:500;color:var(--text)}
-.setting-arrow{color:var(--text-secondary);font-size:18px}
-
-.tips-card{background:linear-gradient(135deg,var(--primary-light),#ecfdf5);border-radius:var(--radius);padding:20px;margin-bottom:16px;border:1px solid #bbf7d0}
-.tips-title{font-size:15px;font-weight:600;color:var(--primary-dark);margin-bottom:8px}
-.tips-text{font-size:14px;color:#166534;line-height:1.7}
-
+/* Quote */
 .quote{text-align:center;padding:20px;color:var(--text-secondary);font-size:14px;font-style:italic}
 
 /* Bottom Nav */
@@ -132,48 +156,137 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC
   </div>
 </div>
 
-<!-- Tab 1: Home -->
+<!-- Tab 1: 首页 -->
 <div class="tab-content active" id="tab-home">
-  <div class="weight-card">
-    <div>
-      <span class="weight-value" id="homeWeight">--</span><span class="weight-unit">kg</span>
-    </div>
-    <div class="weight-change" id="homeChange">今日未记录</div>
-    <div class="input-wrap">
-      <input type="number" id="homeWeightInput" step="0.1" min="30" max="200" placeholder="输入体重">
-      <button class="btn-white" onclick="saveHomeWeight()">记录</button>
-    </div>
-    <div class="quick-actions">
-      <button onclick="adjustHomeWeight(-0.1)">−0.1</button>
-      <button onclick="adjustHomeWeight(0.1)">+0.1</button>
-      <button onclick="quickSaveHome()">快速记录</button>
-    </div>
+  <div class="welcome-card">
+    <h2>💪 保持饥饿</h2>
+    <p>做更好更健康的自己</p>
   </div>
   
   <div class="card">
     <div class="card-title">📊 今日概览</div>
     <div class="stats-grid">
       <div class="stat-item">
-        <div class="stat-value" id="statWater">0</div>
+        <div class="stat-value" id="homeWeight">--</div>
+        <div class="stat-label">今日体重(kg)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="homeSteps">--</div>
+        <div class="stat-label">今日步数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="homeWater">0</div>
         <div class="stat-label">饮水(杯)</div>
       </div>
       <div class="stat-item">
-        <div class="stat-value" id="statSteps">--</div>
-        <div class="stat-label">步数</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-value" id="homeTotal">0</div>
         <div class="stat-label">记录天数</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="statAvg">--</div>
-        <div class="stat-label">平均体重</div>
       </div>
     </div>
   </div>
+  
+  <div class="card">
+    <div class="card-title">⚡ 快速入口</div>
+    <div class="quick-entry">
+      <button onclick="switchTab('weight')">
+        <span class="icon">⚖️</span>
+        <span>记体重</span>
+      </button>
+      <button onclick="switchTab('steps')">
+        <span class="icon">👟</span>
+        <span>记步数</span>
+      </button>
+      <button onclick="switchTab('water')">
+        <span class="icon">💧</span>
+        <span>记饮水</span>
+      </button>
+    </div>
+  </div>
+  
+  <div class="quote">坚持记录，见证改变</div>
 </div>
 
-<!-- Tab 2: Trend -->
+<!-- Tab 2: 体重 -->
+<div class="tab-content" id="tab-weight">
+  <div class="weight-card">
+    <div>
+      <span class="weight-value" id="weightDisplay">--</span><span class="weight-unit">kg</span>
+    </div>
+    <div class="weight-change" id="weightChange">今日未记录</div>
+    <div class="input-wrap">
+      <input type="number" id="weightInput" step="0.1" min="30" max="200" placeholder="输入今日体重">
+      <button class="btn-white" onclick="saveWeight()">记录</button>
+    </div>
+    <div class="adjust-btns">
+      <button onclick="adjustWeight(-0.1)">−0.1</button>
+      <button onclick="adjustWeight(0.1)">+0.1</button>
+      <button onclick="quickWeight()">快速记录</button>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-title">📋 近期记录</div>
+    <div class="history-list" id="weightHistory"></div>
+  </div>
+</div>
+
+<!-- Tab 3: 步数 -->
+<div class="tab-content" id="tab-steps">
+  <div class="steps-display">
+    <div class="steps-icon">👟</div>
+    <div class="steps-value" id="stepsDisplay">--</div>
+    <div class="steps-label">今日步数</div>
+    <div class="steps-goal">目标: 10,000 步/天</div>
+  </div>
+  
+  <div class="steps-input-card">
+    <h3>📝 记录步数</h3>
+    <div class="steps-input-wrap">
+      <input type="number" id="stepsInput" placeholder="输入步数">
+      <button onclick="saveSteps()">保存</button>
+    </div>
+    <div class="quick-steps">
+      <button onclick="setSteps(3000)">3,000</button>
+      <button onclick="setSteps(5000)">5,000</button>
+      <button onclick="setSteps(8000)">8,000</button>
+      <button onclick="setSteps(10000)">10,000</button>
+      <button onclick="setSteps(12000)">12,000</button>
+      <button onclick="setSteps(15000)">15,000</button>
+    </div>
+  </div>
+  
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">📋 近期记录</div>
+    <div class="history-list" id="stepsHistory"></div>
+  </div>
+</div>
+
+<!-- Tab 4: 饮水 -->
+<div class="tab-content" id="tab-water">
+  <div class="water-display">
+    <div class="water-icon">💧</div>
+    <div class="water-value" id="waterDisplay">0</div>
+    <div class="water-label">今日饮水 (杯)</div>
+    <div class="water-cups" id="waterCups"></div>
+  </div>
+  
+  <div class="water-controls">
+    <button class="water-btn minus" onclick="addWater(-1)">−</button>
+    <button class="water-btn plus" onclick="addWater(1)">+</button>
+  </div>
+  
+  <div class="water-tips" style="margin-top:20px">
+    <h4>💡 饮水小贴士</h4>
+    <p>建议每天饮水 8 杯（约 2000ml），保持身体水分充足有助于新陈代谢和减肥。</p>
+  </div>
+  
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">📋 近期记录</div>
+    <div class="history-list" id="waterHistory"></div>
+  </div>
+</div>
+
+<!-- Tab 5: 趋势 -->
 <div class="tab-content" id="tab-trend">
   <div class="card">
     <div class="card-title">📈 30天体重趋势</div>
@@ -184,91 +297,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC
   
   <div class="card">
     <div class="card-title">📊 数据统计</div>
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-value" id="trendTotal">0</div>
-        <div class="stat-label">记录天数</div>
+    <div class="trend-stats">
+      <div class="trend-stat">
+        <div class="trend-stat-value" id="statTotal">0</div>
+        <div class="trend-stat-label">记录天数</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-value" id="trendMin">--</div>
-        <div class="stat-label">最低体重</div>
+      <div class="trend-stat">
+        <div class="trend-stat-value" id="statMin">--</div>
+        <div class="trend-stat-label">最低体重</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-value" id="trendMax">--</div>
-        <div class="stat-label">最高体重</div>
+      <div class="trend-stat">
+        <div class="trend-stat-value" id="statMax">--</div>
+        <div class="trend-stat-label">最高体重</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-value" id="trendChange">--</div>
-        <div class="stat-label">总变化</div>
+      <div class="trend-stat">
+        <div class="trend-stat-value" id="statAvg">--</div>
+        <div class="trend-stat-label">平均体重</div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- Tab 3: Track -->
-<div class="tab-content" id="tab-track">
-  <div class="track-card">
-    <div class="track-icon">💧</div>
-    <div class="track-info">
-      <div class="track-title">饮水记录</div>
-      <div><span class="track-value" id="trackWater">0</span><span class="track-unit">杯</span></div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="track-btn" onclick="addWater(-1)" style="background:#f1f5f9;color:var(--text)">−</button>
-      <button class="track-btn" onclick="addWater(1)">+</button>
     </div>
   </div>
   
-  <div class="track-card" style="flex-direction:column;align-items:stretch;gap:16px">
-    <div style="display:flex;align-items:center;gap:16px">
-      <div class="track-icon">👟</div>
-      <div class="track-info">
-        <div class="track-title">步数记录</div>
-        <div id="trackStepsDisplay" style="font-size:14px;color:var(--text-secondary);margin-top:4px">今日未记录</div>
-      </div>
+  <div class="card">
+    <div class="card-title">💾 数据管理</div>
+    <div class="quick-entry">
+      <button onclick="exportData()">
+        <span class="icon">📤</span>
+        <span>导出数据</span>
+      </button>
+      <button onclick="document.getElementById('importFile').click()">
+        <span class="icon">📥</span>
+        <span>导入数据</span>
+      </button>
     </div>
-    <div class="track-input">
-      <input type="number" id="trackStepsInput" placeholder="输入今日步数">
-      <button onclick="saveTrackSteps()">保存</button>
-    </div>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this.files[0])">
   </div>
-  
-  <div class="tips-card">
-    <div class="tips-title">💡 健康目标</div>
-    <div class="tips-text">• 每日饮水：8杯（约2000ml）<br>• 每日步数：8000-10000步<br>• 健康减重：每周0.5-1kg</div>
-  </div>
-</div>
-
-<!-- Tab 4: History -->
-<div class="tab-content" id="tab-history">
-  <div class="history-list" id="historyList"></div>
-</div>
-
-<!-- Tab 5: Settings -->
-<div class="tab-content" id="tab-settings">
-  <div class="tips-card">
-    <div class="tips-title">💪 减肥小贴士</div>
-    <div class="tips-text">每天记录体重，关注长期趋势而非单日波动。保持饥饿感不是饿肚子，而是选择更健康的食物。坚持就是胜利！</div>
-  </div>
-  
-  <div class="setting-item" onclick="exportData()">
-    <div class="setting-left">
-      <div class="setting-icon">📤</div>
-      <div class="setting-title">导出数据</div>
-    </div>
-    <div class="setting-arrow">›</div>
-  </div>
-  
-  <div class="setting-item" onclick="document.getElementById('importFile').click()">
-    <div class="setting-left">
-      <div class="setting-icon">📥</div>
-      <div class="setting-title">导入数据</div>
-    </div>
-    <div class="setting-arrow">›</div>
-  </div>
-  <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this.files[0])">
-  
-  <div class="quote">保持饥饿，做更好更健康的自己</div>
 </div>
 
 <!-- Bottom Navigation -->
@@ -277,21 +339,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC
     <span class="icon">🏠</span>
     <span class="label">首页</span>
   </button>
+  <button class="nav-item" onclick="switchTab('weight')">
+    <span class="icon">⚖️</span>
+    <span class="label">体重</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('steps')">
+    <span class="icon">👟</span>
+    <span class="label">步数</span>
+  </button>
+  <button class="nav-item" onclick="switchTab('water')">
+    <span class="icon">💧</span>
+    <span class="label">饮水</span>
+  </button>
   <button class="nav-item" onclick="switchTab('trend')">
     <span class="icon">📈</span>
     <span class="label">趋势</span>
-  </button>
-  <button class="nav-item" onclick="switchTab('track')">
-    <span class="icon">➕</span>
-    <span class="label">记录</span>
-  </button>
-  <button class="nav-item" onclick="switchTab('history')">
-    <span class="icon">📋</span>
-    <span class="label">历史</span>
-  </button>
-  <button class="nav-item" onclick="switchTab('settings')">
-    <span class="icon">⚙️</span>
-    <span class="label">我的</span>
   </button>
 </div>
 
@@ -310,10 +372,16 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
-  event.currentTarget.classList.add('active');
+  
+  // Find the nav button that was clicked and add active class
+  let navButtons = document.querySelectorAll('.nav-item');
+  let tabIndex = ['home','weight','steps','water','trend'].indexOf(tab);
+  if (tabIndex >= 0) navButtons[tabIndex].classList.add('active');
   
   if (tab === 'trend') drawChart();
-  if (tab === 'history') renderHistory();
+  if (tab === 'weight') renderWeightHistory();
+  if (tab === 'steps') renderStepsHistory();
+  if (tab === 'water') renderWaterHistory();
 }
 
 function prevDay() {
@@ -341,39 +409,56 @@ function changeDate(val) {
 }
 
 function render() {
-  let w = data.weights[selectedDate] || null;
-  let weightDisplay = document.getElementById('homeWeight');
-  let changeDisplay = document.getElementById('homeChange');
+  // Home tab
+  let w = data.weights[selectedDate];
+  document.getElementById('homeWeight').textContent = w ? w.weight.toFixed(1) : '--';
   
+  let s = data.steps[selectedDate];
+  document.getElementById('homeSteps').textContent = s ? (s/1000).toFixed(1) + 'k' : '--';
+  
+  let cups = data.waters[selectedDate] || 0;
+  document.getElementById('homeWater').textContent = cups;
+  
+  let totalDays = Object.keys(data.weights).length;
+  document.getElementById('homeTotal').textContent = totalDays;
+  
+  // Weight tab
+  let weightDisplay = document.getElementById('weightDisplay');
+  let weightChange = document.getElementById('weightChange');
   if (w) {
     weightDisplay.textContent = w.weight.toFixed(1);
     let prev = getPrevWeight();
     if (prev !== null) {
       let diff = w.weight - prev;
       let arrow = diff < 0 ? '↓' : diff > 0 ? '↑' : '→';
-      let color = diff < 0 ? '#a7f3d0' : diff > 0 ? '#fecaca' : '#fff';
-      changeDisplay.innerHTML = `<span class="arrow">${arrow}</span>较昨日 ${diff > 0 ? '+' : ''}${diff.toFixed(1)} kg`;
-      changeDisplay.style.color = color;
+      weightChange.innerHTML = `${arrow} 较昨日 ${diff > 0 ? '+' : ''}${diff.toFixed(1)} kg`;
+      weightChange.style.background = diff < 0 ? 'rgba(167,243,208,0.3)' : diff > 0 ? 'rgba(254,202,202,0.3)' : 'rgba(255,255,255,0.15)';
     } else {
-      changeDisplay.innerHTML = '首次记录 🎉';
-      changeDisplay.style.color = '#fff';
+      weightChange.innerHTML = '首次记录 🎉';
+      weightChange.style.background = 'rgba(255,255,255,0.15)';
     }
   } else {
     weightDisplay.textContent = '--';
-    changeDisplay.innerHTML = '今日未记录';
-    changeDisplay.style.color = 'rgba(255,255,255,0.8)';
+    weightChange.innerHTML = '今日未记录';
+    weightChange.style.background = 'rgba(255,255,255,0.15)';
   }
   
-  let cups = data.waters[selectedDate] || 0;
-  document.getElementById('statWater').textContent = cups;
-  document.getElementById('trackWater').textContent = cups;
+  // Steps tab
+  let stepsDisplay = document.getElementById('stepsDisplay');
+  stepsDisplay.textContent = s ? s.toLocaleString() : '--';
   
-  let steps = data.steps[selectedDate];
-  document.getElementById('statSteps').textContent = steps ? (steps/1000).toFixed(1) + 'k' : '--';
-  document.getElementById('trackStepsDisplay').textContent = steps ? `今日已记录 ${steps.toLocaleString()} 步` : '今日未记录步数';
+  // Water tab
+  let waterDisplay = document.getElementById('waterDisplay');
+  waterDisplay.textContent = cups;
+  renderWaterCups(cups);
   
-  updateStats();
-  if (currentTab === 'history') renderHistory();
+  // Trend tab stats
+  updateTrendStats();
+  
+  // Update histories
+  if (currentTab === 'weight') renderWeightHistory();
+  if (currentTab === 'steps') renderStepsHistory();
+  if (currentTab === 'water') renderWaterHistory();
 }
 
 function getPrevWeight() {
@@ -385,69 +470,84 @@ function getPrevWeight() {
   return null;
 }
 
-function updateStats() {
+function updateTrendStats() {
   let dates = Object.keys(data.weights).sort();
   let total = dates.length;
   document.getElementById('statTotal').textContent = total;
-  document.getElementById('trendTotal').textContent = total;
   
   if (dates.length > 0) {
     let weights = dates.map(d => data.weights[d].weight);
-    let avg = weights.reduce((a,b) => a+b, 0) / weights.length;
     let min = Math.min(...weights);
     let max = Math.max(...weights);
+    let avg = weights.reduce((a,b) => a+b, 0) / weights.length;
+    document.getElementById('statMin').textContent = min.toFixed(1);
+    document.getElementById('statMax').textContent = max.toFixed(1);
     document.getElementById('statAvg').textContent = avg.toFixed(1);
-    document.getElementById('trendMin').textContent = min.toFixed(1);
-    document.getElementById('trendMax').textContent = max.toFixed(1);
-    
-    if (dates.length > 1) {
-      let change = weights[weights.length-1] - weights[0];
-      let sign = change > 0 ? '+' : '';
-      document.getElementById('trendChange').textContent = sign + change.toFixed(1);
-      document.getElementById('trendChange').style.color = change < 0 ? 'var(--primary)' : change > 0 ? '#dc2626' : 'var(--text-secondary)';
-    } else {
-      document.getElementById('trendChange').textContent = '--';
-    }
   } else {
+    document.getElementById('statMin').textContent = '--';
+    document.getElementById('statMax').textContent = '--';
     document.getElementById('statAvg').textContent = '--';
-    document.getElementById('trendMin').textContent = '--';
-    document.getElementById('trendMax').textContent = '--';
-    document.getElementById('trendChange').textContent = '--';
   }
 }
 
-function renderHistory() {
-  let list = document.getElementById('historyList');
-  let entries = Object.keys(data.weights).sort().reverse();
+function renderWeightHistory() {
+  renderHistoryList('weightHistory', data.weights, 'kg', true);
+}
+
+function renderStepsHistory() {
+  renderHistoryList('stepsHistory', data.steps, '步', false);
+}
+
+function renderWaterHistory() {
+  renderHistoryList('waterHistory', data.waters, '杯', false);
+}
+
+function renderHistoryList(elementId, dataObj, unit, showDiff) {
+  let list = document.getElementById(elementId);
+  let entries = Object.keys(dataObj).sort().reverse().slice(0, 10);
   
   if (entries.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">暂无记录</div>';
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-secondary)">暂无记录</div>';
     return;
   }
   
   let html = '';
   for (let i = 0; i < entries.length; i++) {
     let date = entries[i];
-    let w = data.weights[date].weight;
-    let prev = i < entries.length - 1 ? data.weights[entries[i+1]].weight : null;
-    let diff = prev !== null ? (w - prev).toFixed(1) : '';
-    let diffClass = prev !== null ? (w < prev ? 'down' : w > prev ? 'up' : '') : '';
+    let val = dataObj[date];
+    if (typeof val === 'object') val = val.weight || val.value || 0;
+    
+    let prev = null, diff = '', diffClass = '';
+    if (showDiff && i < entries.length - 1) {
+      let prevVal = dataObj[entries[i+1]];
+      if (typeof prevVal === 'object') prevVal = prevVal.weight || prevVal.value || 0;
+      prev = prevVal;
+      diff = (val - prev).toFixed(1);
+      diffClass = val < prev ? 'down' : val > prev ? 'up' : '';
+    }
     
     let d = new Date(date + 'T12:00:00');
     let weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
     let isToday = date === new Date().toISOString().slice(0,10);
+    let isSelected = date === selectedDate;
     
-    html += '<div class="history-item">';
+    html += '<div class="history-item" onclick="selectDate(\'' + date + '\')" style="cursor:pointer;' + (isSelected ? 'border-color:var(--primary);background:#f0fdf4' : '') + '">';
     html += '<div class="history-date"><span class="day">' + (isToday ? '今天' : (d.getMonth()+1) + '/' + d.getDate()) + '</span><span class="weekday">' + weekdays[d.getDay()] + '</span></div>';
-    html += '<div class="history-right"><div class="history-weight">' + w.toFixed(1) + ' kg</div>';
-    if (diff) html += '<div class="history-diff ' + diffClass + '">' + (parseFloat(diff) > 0 ? '+' : '') + diff + ' kg</div>';
+    html += '<div class="history-right"><div class="history-value">' + (typeof val === 'number' ? val.toFixed(showDiff ? 1 : 0) : val) + ' ' + unit + '</div>';
+    if (diff && showDiff) html += '<div class="history-diff ' + diffClass + '">' + (parseFloat(diff) > 0 ? '+' : '') + diff + ' ' + unit + '</div>';
     html += '</div></div>';
   }
   list.innerHTML = html;
 }
 
-function saveHomeWeight() {
-  let val = parseFloat(document.getElementById('homeWeightInput').value);
+function selectDate(date) {
+  selectedDate = date;
+  document.getElementById('selectedDate').value = date;
+  render();
+}
+
+function saveWeight() {
+  let val = parseFloat(document.getElementById('weightInput').value);
   if (!val || val < 30 || val > 200) {
     alert('请输入有效体重 (30-200kg)');
     return;
@@ -455,17 +555,17 @@ function saveHomeWeight() {
   data.weights[selectedDate] = { weight: val };
   save();
   render();
-  document.getElementById('homeWeightInput').value = '';
+  document.getElementById('weightInput').value = '';
 }
 
-function adjustHomeWeight(delta) {
-  let input = document.getElementById('homeWeightInput');
+function adjustWeight(delta) {
+  let input = document.getElementById('weightInput');
   let current = parseFloat(input.value) || 70;
   input.value = (current + delta).toFixed(1);
 }
 
-function quickSaveHome() {
-  let val = document.getElementById('homeWeightInput').value;
+function quickWeight() {
+  let val = document.getElementById('weightInput').value;
   if (!val) {
     let entries = Object.keys(data.weights).sort().reverse();
     if (entries.length > 0 && entries[0] !== selectedDate) {
@@ -478,7 +578,23 @@ function quickSaveHome() {
   data.weights[selectedDate] = { weight: parseFloat(val) };
   save();
   render();
-  document.getElementById('homeWeightInput').value = '';
+  document.getElementById('weightInput').value = '';
+}
+
+function setSteps(val) {
+  document.getElementById('stepsInput').value = val;
+}
+
+function saveSteps() {
+  let val = parseInt(document.getElementById('stepsInput').value);
+  if (!val || val < 0) {
+    alert('请输入有效步数');
+    return;
+  }
+  data.steps[selectedDate] = val;
+  save();
+  render();
+  document.getElementById('stepsInput').value = '';
 }
 
 function addWater(delta) {
@@ -489,16 +605,13 @@ function addWater(delta) {
   render();
 }
 
-function saveTrackSteps() {
-  let val = parseInt(document.getElementById('trackStepsInput').value);
-  if (!val || val < 0) {
-    alert('请输入有效步数');
-    return;
+function renderWaterCups(cups) {
+  let container = document.getElementById('waterCups');
+  let html = '';
+  for (let i = 1; i <= 8; i++) {
+    html += '<div class="water-cup ' + (i <= cups ? 'filled' : '') + '">' + (i <= cups ? '💧' : '') + '</div>';
   }
-  data.steps[selectedDate] = val;
-  save();
-  render();
-  document.getElementById('trackStepsInput').value = '';
+  container.innerHTML = html;
 }
 
 function drawChart() {
@@ -506,7 +619,7 @@ function drawChart() {
   let ctx = canvas.getContext('2d');
   let rect = canvas.parentElement.getBoundingClientRect();
   canvas.width = rect.width;
-  canvas.height = 240;
+  canvas.height = 260;
   let width = canvas.width;
   let height = canvas.height;
   
@@ -538,6 +651,7 @@ function drawChart() {
   
   ctx.clearRect(0, 0, width, height);
   
+  // Grid lines
   ctx.strokeStyle = '#f1f5f9';
   ctx.lineWidth = 1;
   for (let i = 0; i <= 4; i++) {
@@ -554,10 +668,12 @@ function drawChart() {
     ctx.fillText(weight.toFixed(1), padding - 8, y + 4);
   }
   
+  // Gradient fill
   let gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
   gradient.addColorStop(0, 'rgba(16,185,129,0.3)');
   gradient.addColorStop(1, 'rgba(16,185,129,0)');
   
+  // Fill area
   ctx.beginPath();
   let firstPoint = true;
   let points = [];
@@ -583,6 +699,7 @@ function drawChart() {
     ctx.fill();
   }
   
+  // Line
   ctx.beginPath();
   firstPoint = true;
   for (let i = 0; i < 30; i++) {
@@ -601,6 +718,7 @@ function drawChart() {
   ctx.lineWidth = 3;
   ctx.stroke();
   
+  // Points
   for (let i = 0; i < 30; i++) {
     if (weights[i] !== null) {
       let x = padding + (chartW / 29) * i;
